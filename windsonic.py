@@ -5,15 +5,15 @@ from os import path
 
 from gpiozero import Button
 
-ser = serial.Serial('COM4')
+ser = serial.Serial('/dev/ttyUSB0', 38400)
 
 
 dataIter = 1
 dataName_base = "test_"
 dataName = "test_1"
 
-def utf8len(s): #For counting bytes for checksum
-    return len(s.encode('utf-8'))
+# def utf8len(s): #For counting bytes for checksum
+#     return len(s.encode('utf-8'))
 
 #Want to only log data when switch on gpio
 
@@ -32,11 +32,11 @@ if log:
 try:
     while True:
         newDat = ser.readline()
-        newDat2 = newDat.replace("<STX>", "")
-        newDat3 = newDat.replace("<ETX>", "")
-        byteChk = utf8len(newDat3)
-        f.write(newDat3)
-        sys.stdout.write(newDat3+"\r")
+        newDat2 = newDat.replace(b"<STX>", b"")
+        newDat3 = newDat.replace(b"<ETX>", b"")
+        # byteChk = utf8len(newDat3)
+        f.write(str(newDat3))
+        sys.stdout.write(str(newDat3)+"\r")
         sys.stdout.flush()
 
 except KeyboardInterrupt:
