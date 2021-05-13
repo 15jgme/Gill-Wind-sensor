@@ -14,7 +14,7 @@ dataName_base = "test_"
 dataName = "test_1"
 
 
-switch = Button(4) #Init switch for data logging
+switch = Button(4, pull_up=False) #Init switch for data logging
 
 ledInd = 0 #LED interator for use with blinking
 
@@ -25,9 +25,9 @@ if log:
         dataName = dataName_base + str(dataIter + 1) #If not unique incriment file name
         dataIter = dataIter + 1 #...Iter
     f = open(dataName+".txt", "w") #Create unique file
-    f.write("test " + str(dataIter) + "Windsonic sensor")
-    f.write("DATA FORMAT")
-    f.write("Format, Wind Direction, Wind Speed, Units, Status, Checksum")
+    f.write("test " + str(dataIter) + " Windsonic sensor\n")
+    f.write("DATA FORMAT\n")
+    f.write("Format, Wind Direction, Wind Speed, Units, Status, Checksum\n")
 
 #ACTIVATE LED
 os.system("echo none > /sys/class/leds/led0/trigger")
@@ -40,14 +40,15 @@ def ledOff():
 #DATA LOGGING SECTION
 while True: #Logging loop
     try:
-        if switch.is_active: #Logging switch is flicked 
+        #print(switch.is_pressed)
+        if switch.is_pressed: #Logging switch is flicked 
             #Only log when switch is active
             newDat = ser.readline()
             newDat2 = newDat.replace(b"<STX>", b"")
             newDat3 = newDat.replace(b"<ETX>", b"")
             # byteChk = utf8len(newDat3)
             toWrite = str(time.process_time()) + "," + str(newDat3)
-            f.write(toWrite)
+            f.write(toWrite + "\n")
             sys.stdout.write(toWrite+"\r")
             sys.stdout.flush()
             

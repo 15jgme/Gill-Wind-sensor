@@ -1,0 +1,3 @@
+test 6 Windsonic sensor
+DATA FORMAT
+Format, Wind Direction, Wind Speed, Units, Status, Checksum
