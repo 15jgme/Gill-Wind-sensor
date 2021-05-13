@@ -14,7 +14,11 @@ dataName_base = "test_"
 dataName = "test_1"
 
 
-switch = Button(4, pull_up=False) #Init switch for data logging
+#SWITCH 1 IS THE SWITCH TO ENABLE/DISABLE LOGGING
+#SWITCH 2 IS THE END AND KILL SWITCH!
+
+switch1 = Button(4, pull_up=False) #Init switch for data logging
+switch2 = Button(17, pull_up=True) #Init switch for data logging
 
 ledInd = 0 #LED interator for use with blinking
 
@@ -41,7 +45,7 @@ def ledOff():
 while True: #Logging loop
     try:
         #print(switch.is_pressed)
-        if switch.is_pressed: #Logging switch is flicked 
+        if switch1.is_pressed: #Logging switch is flicked 
             #Only log when switch is active
             newDat = ser.readline()
             newDat2 = newDat.replace(b"<STX>", b"")
@@ -57,9 +61,16 @@ while True: #Logging loop
 
             if ledInd % 19 == 0:
                 ledOff()
+        
+        elif switch1.is_pressed: #Kill switch is flicked 
+            break #Head to the end of the program where the file is closed and system is shutdown
+            
     
     except KeyboardInterrupt:
         print("Pressed Ctrl-C to terminate while statement")
         break
 
 
+#ENDGAME 
+f.clsoe()                  #⛔⛔⛔⛔ CLOSE FILE
+os.system("sudo shutdown") #☠️☠️☠️☠️ KILL
