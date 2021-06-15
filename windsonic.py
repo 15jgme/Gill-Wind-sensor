@@ -4,12 +4,17 @@ import time
 from os import path
 from datetime import datetime
 
+t0 = time.time() #Get innitial time 
+
+datTime = datetime.now() # current date and time
+dat = "hr_" + datTime.strftime("%H") + "_min_" + datTime.strftime("%M") + "_sec_" + datTime.strftime("%S")  + "d_" + datTime.strftime("%d") + "_m_" + datTime.strftime("%m") + "_y_" + datTime.strftime("%Y") + "_"
+
 descriptor =  input("Please enter descriptor for this test (no special characters)")
 
 dataIter = 1
 dataName_base = "test_"
 descriptorNS = descriptor.replace(' ', '_')
-dataName = dataName_base + descriptorNS + "_1"
+dataName = dataName_base + dat + descriptorNS + "_1"
 
 #FILE CREATION AND HEADERS
 log = True
@@ -35,7 +40,7 @@ while True: #Logging loop
         newDat2 = newDat.replace(b"<STX>", b"")
         newDat3 = newDat.replace(b"<ETX>", b"")
         # byteChk = utf8len(newDat3)
-        toWrite = str(time.process_time()) + "," + str(newDat3)
+        toWrite = str(time.time() - t0) + "," + str(newDat3)
         f.write(toWrite + "\n")
         sys.stdout.write(toWrite+"\r")
         sys.stdout.flush()
