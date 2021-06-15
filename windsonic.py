@@ -14,14 +14,6 @@ dataName_base = "test_"
 dataName = "test_1"
 
 
-#SWITCH 1 IS THE SWITCH TO ENABLE/DISABLE LOGGING
-#SWITCH 2 IS THE END AND KILL SWITCH!
-
-switch1 = Button(4, pull_up=False) #Init switch for data logging
-switch2 = Button(17, pull_up=True) #Init switch for data logging
-
-ledInd = 0 #LED interator for use with blinking
-
 #FILE CREATION AND HEADERS
 log = True
 if log:
@@ -32,14 +24,6 @@ if log:
     f.write("test " + str(dataIter) + " Windsonic sensor\n")
     f.write("DATA FORMAT\n")
     f.write("Format, Wind Direction, Wind Speed, Units, Status, Checksum\n")
-
-#ACTIVATE LED
-os.system("echo none > /sys/class/leds/led0/trigger")
-
-def ledOn():
-    os.system("echo 1 >/sys/class/leds/led0/brightness")
-def ledOff():
-    os.system("echo 0 >/sys/class/leds/led0/brightness")
 
 #DATA LOGGING SECTION
 while True: #Logging loop
