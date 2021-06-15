@@ -1,18 +1,14 @@
 import serial
 import sys
-import os.path
 import time
 from os import path
 
-from gpiozero import Button
-
-ser = serial.Serial('/dev/ttyUSB0', 38400)
-
+descriptor =  input("Please enter descriptor for this test (no special characters)")
 
 dataIter = 1
 dataName_base = "test_"
-dataName = "test_1"
-
+descriptorNS = descriptor.replace(' ', '_')
+dataName = dataName_base + descriptorNS + "_1"
 
 #FILE CREATION AND HEADERS
 log = True
@@ -22,39 +18,33 @@ if log:
         dataIter = dataIter + 1 #...Iter
     f = open(dataName+".txt", "w") #Create unique file
     f.write("test " + str(dataIter) + " Windsonic sensor\n")
+    f.write("Descriptor, :" + descriptor)
     f.write("DATA FORMAT\n")
     f.write("Format, Wind Direction, Wind Speed, Units, Status, Checksum\n")
 
 #DATA LOGGING SECTION
+ser = serial.Serial('/dev/ttyUSB0', 38400)
+
+input("Serial connectio established, press enter to begin logging")
+
 while True: #Logging loop
     try:
-        #print(switch.is_pressed)
-        if switch1.is_pressed: #Logging switch is flicked 
-            #Only log when switch is active
-            newDat = ser.readline()
-            newDat2 = newDat.replace(b"<STX>", b"")
-            newDat3 = newDat.replace(b"<ETX>", b"")
-            # byteChk = utf8len(newDat3)
-            toWrite = str(time.process_time()) + "," + str(newDat3)
-            f.write(toWrite + "\n")
-            sys.stdout.write(toWrite+"\r")
-            sys.stdout.flush()
-            
-            if ledInd % 40 == 0:
-                ledOn()
 
-            if ledInd % 19 == 0:
-                ledOff()
-        
-        elif switch1.is_pressed: #Kill switch is flicked 
-            break #Head to the end of the program where the file is closed and system is shutdown
+        #Only log when switch is active
+        newDat = ser.readline()
+        newDat2 = newDat.replace(b"<STX>", b"")
+        newDat3 = newDat.replace(b"<ETX>", b"")
+        # byteChk = utf8len(newDat3)
+        toWrite = str(time.process_time()) + "," + str(newDat3)
+        f.write(toWrite + "\n")
+        sys.stdout.write(toWrite+"\r")
+        sys.stdout.flush()
             
-    
+
     except KeyboardInterrupt:
         print("Pressed Ctrl-C to terminate while statement")
         break
 
 
 #ENDGAME 
-f.clsoe()                  #⛔⛔⛔⛔ CLOSE FILE
-os.system("sudo shutdown") #☠️☠️☠️☠️ KILL
+f.close()                  #⛔⛔⛔⛔ CLOSE FILE

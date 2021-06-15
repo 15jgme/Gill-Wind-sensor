@@ -1,1 +1,0 @@
-test 2Windsonic sensorDATA FORMATFormat, Wind Direction, Wind Speed, Units, Status, Checksum
