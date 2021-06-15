@@ -2,6 +2,7 @@ import serial
 import sys
 import time
 from os import path
+from datetime import datetime
 
 descriptor =  input("Please enter descriptor for this test (no special characters)")
 
@@ -18,7 +19,7 @@ if log:
         dataIter = dataIter + 1 #...Iter
     f = open(dataName+".txt", "w") #Create unique file
     f.write("test " + str(dataIter) + " Windsonic sensor\n")
-    f.write("Descriptor, :" + descriptor)
+    f.write("Descriptor, :" + descriptor + '\n')
     f.write("DATA FORMAT\n")
     f.write("Format, Wind Direction, Wind Speed, Units, Status, Checksum\n")
 
@@ -29,7 +30,6 @@ input("Serial connectio established, press enter to begin logging")
 
 while True: #Logging loop
     try:
-
         #Only log when switch is active
         newDat = ser.readline()
         newDat2 = newDat.replace(b"<STX>", b"")

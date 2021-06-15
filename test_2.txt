@@ -1,0 +1,4 @@
+test 2 Windsonic sensor
+Descriptor, :
+DATA FORMAT
+Format, Wind Direction, Wind Speed, Units, Status, Checksum
