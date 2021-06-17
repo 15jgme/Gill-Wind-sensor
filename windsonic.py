@@ -4,6 +4,8 @@ import time
 from os import path
 from datetime import datetime
 
+from threading import Thread
+
 t0 = time.time() #Get innitial time 
 
 datTime = datetime.now() # current date and time
@@ -15,6 +17,8 @@ dataIter = 1
 dataName_base = "test_"
 descriptorNS = descriptor.replace(' ', '_')
 dataName = dataName_base + dat + descriptorNS + "_1"
+
+exitStat = False
 
 #FILE CREATION AND HEADERS
 log = True
@@ -31,25 +35,39 @@ if log:
 #DATA LOGGING SECTION
 ser = serial.Serial('/dev/ttyUSB0', 38400)
 
-input("Serial connectio established, press enter to begin logging")
+def log():
+    if exitStat:
+        log_thread.join() #Kill thread
+    else:
+        try:
+            #Only log when switch is active
+            newDat = ser.readline()
+            newDat2 = newDat.replace(b"<STX>", b"")
+            newDat3 = newDat.replace(b"<ETX>", b"")
+            # byteChk = utf8len(newDat3)
+            toWrite = str(time.time() - t0) + "," + str(newDat3)
+            f.write(toWrite + "\n")
+            sys.stdout.write(toWrite+"\r")
+            sys.stdout.flush()
+        except KeyboardInterrupt:
+            print("Pressed Ctrl-C to terminate while statement")
 
-while True: #Logging loop
-    try:
-        #Only log when switch is active
-        newDat = ser.readline()
-        newDat2 = newDat.replace(b"<STX>", b"")
-        newDat3 = newDat.replace(b"<ETX>", b"")
-        # byteChk = utf8len(newDat3)
-        toWrite = str(time.time() - t0) + "," + str(newDat3)
-        f.write(toWrite + "\n")
-        sys.stdout.write(toWrite+"\r")
-        sys.stdout.flush()
-            
+def getExitStat():
+    exitIn = input("Press 9 to terminate logging")
+    if exitIn == "9":
+        exitStat = True #Exit logging
+        exit_thread.join() #Kill thread
 
-    except KeyboardInterrupt:
-        print("Pressed Ctrl-C to terminate while statement")
-        break
 
+
+log_thread = Thread(target=log)
+exit_thread = Thread(target=getExitStat)
+input("Serial connection established, press enter to begin logging")
+log_thread.start()
+exit_thread.start()
+
+while log_thread.is_alive() and exit_thread.is_alive():
+    time.sleep(0.1)
 
 #ENDGAME 
 f.close()                  #⛔⛔⛔⛔ CLOSE FILE
