@@ -6,21 +6,13 @@ from os import path
 
 from gpiozero import Button
 
-ser = serial.Serial('/dev/ttyUSB0', 38400)
+ser = serial.Serial('/dev/ttyUSB', 38400)
 
 
 dataIter = 1
 dataName_base = "test_"
 dataName = "test_1"
 
-
-#SWITCH 1 IS THE SWITCH TO ENABLE/DISABLE LOGGING
-#SWITCH 2 IS THE END AND KILL SWITCH!
-
-switch1 = Button(4, pull_up=False) #Init switch for data logging
-switch2 = Button(17, pull_up=True) #Init switch for data logging
-
-ledInd = 0 #LED interator for use with blinking
 
 #FILE CREATION AND HEADERS
 log = True
@@ -31,40 +23,29 @@ if log:
     f = open(dataName+".txt", "w") #Create unique file
     f.write("test " + str(dataIter) + " Windsonic sensor\n")
     f.write("DATA FORMAT\n")
-    f.write("Format, Wind Direction, Wind Speed, Units, Status, Checksum\n")
+    f.write("Time, Format, Wind Direction, Wind Speed, Units, Status, Checksum\n")
 
-#ACTIVATE LED
-os.system("echo none > /sys/class/leds/led0/trigger")
 
-def ledOn():
-    os.system("echo 1 >/sys/class/leds/led0/brightness")
-def ledOff():
-    os.system("echo 0 >/sys/class/leds/led0/brightness")
+t0 = time.time() #set arbitrary time start
+
+print("Writing to file" + dataName + ".txt")
+input("Begin data logging?")
+
+print("Press Ctrl-C to exit program")
 
 #DATA LOGGING SECTION
 while True: #Logging loop
     try:
         #print(switch.is_pressed)
-        if switch1.is_pressed: #Logging switch is flicked 
-            #Only log when switch is active
-            newDat = ser.readline()
-            newDat2 = newDat.replace(b"<STX>", b"")
-            newDat3 = newDat.replace(b"<ETX>", b"")
-            # byteChk = utf8len(newDat3)
-            toWrite = str(time.process_time()) + "," + str(newDat3)
-            f.write(toWrite + "\n")
-            sys.stdout.write(toWrite+"\r")
-            sys.stdout.flush()
-            
-            if ledInd % 40 == 0:
-                ledOn()
-
-            if ledInd % 19 == 0:
-                ledOff()
-        
-        elif switch1.is_pressed: #Kill switch is flicked 
-            break #Head to the end of the program where the file is closed and system is shutdown
-            
+        #Only log when switch is active
+        newDat = ser.readline()
+        newDat2 = newDat.replace(b"<STX>", b"")
+        newDat3 = newDat.replace(b"<ETX>", b"")
+        # byteChk = utf8len(newDat3)
+        toWrite = str(time.time()-t0) + "," + str(newDat3)
+        f.write(toWrite + "\n")
+        sys.stdout.write(toWrite+"\r")
+        sys.stdout.flush()
     
     except KeyboardInterrupt:
         print("Pressed Ctrl-C to terminate while statement")
@@ -72,5 +53,4 @@ while True: #Logging loop
 
 
 #ENDGAME 
-f.clsoe()                  #⛔⛔⛔⛔ CLOSE FILE
-os.system("sudo shutdown") #☠️☠️☠️☠️ KILL
+f.close()                  #⛔⛔⛔⛔ CLOSE FILE
